@@ -196,7 +196,12 @@
 								"sounds/gta.mp3": "https://real.shhnowisnottheti.me/menu.mp3",
 								"records/mellohi.mp3": "https://stream.nightride.fm/chillsynth.m4a"
 							}],
-							"additionalProperties": true
+							"additionalProperties": true,
+							"patternProperties": {
+								"^.*$": {
+									"type": "string"
+								}
+							}
 						},
 						"profanity": {
 							"type": "boolean",
