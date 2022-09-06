@@ -1,0 +1,71 @@
+* {
+	font-family: 'Nunito', sans-serif;
+}
+body {
+	background-color: #111111;
+	color: #dddddd;
+}
+.je-modal {
+	border-radius: 4px !important;
+	box-shadow: none !important;
+	border: 1px solid #eeeeee !important;
+	background-color: #111111 !important;
+	color: #dddddd !important;
+}
+button, select, input, .je-indented-panel, textarea {
+	border-radius: 4px;
+}
+button, select {
+	background-color: #343434;
+	color: #eeeeee;
+	border: 1px solid #eeeeee;
+}
+input, textarea {
+	background-color: #222222;
+	color: #dddddd;
+	border: 1px solid #dddddd;
+}
+textarea {
+	resize: none;
+}
+.je-indented-panel {
+	border: 1px solid #eeeeee;
+}
+input[type=checkbox] {
+	background-color: #343434;
+	color: #eeeeee;
+	border: 1px solid #eeeeee;
+	border-radius: 4px;
+	-webkit-appearance: initial;
+	-moz-appearance: initial;
+	appearance: initial;
+	width: 1.5em;
+	height: 1.5em;
+	margin: 0;
+}
+input[type=checkbox]:checked {
+	background-color: #eeeeee;
+}
+input[type=checkbox]:before {
+	content: 'x<';
+	margin-left: 0em;
+	text-align: center;
+	color: #dddddd;
+}
+input[type=checkbox]:checked:before {
+	content: ':>';
+	margin-left: 0.3em;
+	color: #343434;
+}
+input[disabled] {
+	opacity: 0.6;
+}
+#output {
+	width: 64em;
+	height: 24em;
+	max-width: 75vw;
+	max-height: 50vh;
+}
+a {
+	color: #dddddd;
+}

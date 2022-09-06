@@ -6,58 +6,73 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 		<title>ayunEaglerConfig</title>
 		<script type="text/javascript" src="long.js"></script>
-		<script type="text/javascript" src="PowerNBT.min.js"></script>
 		<script src="jsoneditor.min.js"></script>
 		<link rel="preconnect" href="https://fonts.googleapis.com"/>
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 		<link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet"/>
-		<style>
-			* {
-				font-family: 'Nunito', sans-serif;
-			}
-			body {
-				background-color: #111111;
-				color: #dddddd;
-			}
-			button, select, input, .je-indented-panel {
-				border-radius: 4px;
-			}
-			button, select {
-				background-color: #343434;
-				color: #eeeeee;
-				border: 1px solid #eeeeee;
-			}
-			input {
-				background-color: #222222;
-				color: #dddddd;
-				border: 1px solid #dddddd;
-			}
-			.je-indented-panel {
-				border: 1px solid #eeeeee;
-			}
-		</style>
+		<link href="style.css" rel="stylesheet"/>
 	</head>
 	<body>
+		<sub><a href="old.html">Legacy NBT version</a></sub>
 		<h1>ayunEaglerConfig</h1>
 		<p>Configure & customize your Eaglercraft client here!</p>
-		<button onclick="const nbtnbt = prompt('Enter base64 to import data from:', defB64); if (nbtnbt) loadNBT(nbtnbt);">Import NBT from base64...</button>
-		<button onclick="saveNBT();">Export NBT as base64...</button>
+		<button onclick="saveOpts();">Export eaglercraftOpts variable...</button>
+		<br/>
+		<textarea id="output" readonly rows="16" cols="9"></textarea>
 		<br/>
 		<div id="editor"></div>
 		<script type="text/javascript">
-			const textEncoder = new TextEncoder();
-			const textDecoder = new TextDecoder();
-			const defB64 = 'CgAACQAHc2VydmVycwoAAAABCAAEbmFtZQAMbG9jYWwgc2VydmVyCAACaXAAD2xvY2FsaG9zdDoyNTU2NQEAC2hpZGVBZGRyZXNzAAAKAAhtYWluTWVudQkACHNwbGFzaGVzCAAAAAoACkRhcnZpZ2xldCEADkRhcnZpZ2xvcGhpbGUhAAtZb3UgRWFnbGVyIQALWWVlZWVlZWVlZSEAC1lvdSBZZWVsZXIhAA1FRUVFRUVFRUVFRUUhAAtZb3UgRGFydmlnIQAJWW91IFZpZ2chAAI6PgACfD4AAA==';
-
-			let nbt = NBT.readTag(textEncoder.encode(atob(defB64)));
-			let parsedNBT = {};
-
-			loadNBTPieces();
+			const relayId = Math.floor(Math.random() * 3);
+			const startJson = {
+				container: "game_frame",
+				assetsURI: "assets.epk",
+				serverWorkerURI: "worker_bootstrap.js",
+				worldsFolder: "MAIN",
+				servers: [
+					{
+						serverName: "placeholder",
+						serverAddress: "address here",
+						hideAddress: false
+					}
+				],
+				relays: [
+					{
+						addr: "wss://relay.deev.is/",
+						name: "lax1dude relay #1",
+						primary: relayId == 0
+					},
+					{
+						addr: "wss://relay.lax1dude.net/",
+						name: "lax1dude relay #2",
+						primary: relayId == 1
+					},
+					{
+						addr: "wss://relay.shhnowisnottheti.me/",
+						name: "ayunami relay #1",
+						primary: relayId == 2
+					}
+				],
+				mainMenu: {
+					splashes: [
+						"Darviglet!",
+						"eaglerenophile!",
+						"You Eagler!",
+						"Yeeeeeee!",
+						"yeee",
+						"EEEEEEEEE!",
+						"You Darvig!",
+						"You Vigg!",
+						":>",
+						"|>",
+						"You Yumpster!"
+					],
+					eaglerLogo: false
+				}
+			};
 
 			const editor = new JSONEditor(document.getElementById('editor'), {
-				startval: parsedNBT,
+				startval: startJson,
 				no_additional_properties: true,
-				disable_properties: true,
 				schema: {
 					"$schema": "https://json-schema.org/draft/2019-09/schema",
 					"$id": "http://example.com/example.json",
@@ -65,200 +80,439 @@
 					"default": {},
 					"title": "Eaglercraft Client Settings",
 					"required": [
-						"splashes",
-						"servers"
+						"container",
+						"assetsURI"
 					],
 					"properties": {
-						"splashes": {
-							"type": "array",
-							"default": [],
-							"title": "Splashes",
-							"items": {
-								"type": "string",
-								"title": "Splash Text",
-								"examples": [
-									"Amongst ourselves",
-									"you eagler",
-									"yee",
-									"you darviglet"
-								]
-							},
+						"container": {
+							"type": "string",
+							"default": "",
+							"title": "Element where Eaglercraft will be placed",
 							"examples": [
-								["Amongst ourselves",
-									"you eagler",
-									"yee",
-									"you darviglet"
-								]
+								"game_frame"
+							]
+						},
+						"assetsURI": {
+							"type": "string",
+							"default": "",
+							"title": "URI to assets.epk",
+							"examples": [
+								"assets.epk"
+							]
+						},
+						"serverWorkerURI": {
+							"type": "string",
+							"default": "",
+							"title": "URI to worker_bootstrap.js for singleplayer's web worker",
+							"examples": [
+								"worker_bootstrap.js"
+							]
+						},
+						"worldsFolder": {
+							"type": "string",
+							"default": "",
+							"title": "Internal folder name for worlds",
+							"examples": [
+								"MAIN"
 							]
 						},
 						"servers": {
 							"type": "array",
 							"default": [],
-							"title": "Server Items",
+							"title": "Default servers to show in server list",
 							"items": {
 								"type": "object",
 								"default": {},
-								"title": "Server",
+								"title": "Server entry",
 								"required": [
-									"name",
-									"ip",
-									"hideAddress"
+									"serverName",
+									"serverAddress"
 								],
 								"properties": {
-									"name": {
+									"serverName": {
 										"type": "string",
 										"default": "",
-										"title": "Name",
+										"title": "Name of server",
 										"examples": [
-											"template"
+											"server name"
 										]
 									},
-									"ip": {
+									"serverAddress": {
 										"type": "string",
 										"default": "",
-										"title": "IP",
+										"title": "Address of server",
 										"examples": [
-											"ws(s):// (address here):(port) /"
+											"ws://localhost:25565/"
 										]
 									},
 									"hideAddress": {
 										"type": "boolean",
 										"default": false,
-										"title": "Hide Address",
+										"title": "Hide server address",
 										"examples": [
-											true
+											false
 										]
 									}
 								},
 								"examples": [{
-									"name": "template",
-									"ip": "ws(s):// (address here):(port) /",
-									"hideAddress": true
+									"serverName": "server name",
+									"serverAddress": "ws://localhost:25565/",
+									"hideAddress": false
 								}]
 							},
 							"examples": [
 								[{
-									"name": "template",
-									"ip": "ws(s):// (address here):(port) /",
-									"hideAddress": true
+									"serverName": "server name",
+									"serverAddress": "ws://localhost:25565/",
+									"hideAddress": false
 								}]
 							]
+						},
+						"hideDownServers": {
+							"type": "boolean",
+							"default": false,
+							"title": "Hide servers that seem to be down",
+							"examples": [
+								false
+							]
+						},
+						"joinServer": {
+							"type": "string",
+							"default": "",
+							"title": "Automatically join this server on client load",
+							"examples": [
+								"wss://sus.shhnowisnottheti.me/"
+							]
+						},
+						"assetOverrides": {
+							"type": "object",
+							"default": {},
+							"title": "Map asset paths to URLs here",
+							"required": [
+
+							],
+							"examples": [{
+								"title/no-pano-blur.flag": "",
+								"sounds/gta.mp3": "https://real.shhnowisnottheti.me/menu.mp3",
+								"records/mellohi.mp3": "https://stream.nightride.fm/chillsynth.m4a"
+							}],
+							"additionalProperties": true
+						},
+						"profanity": {
+							"type": "boolean",
+							"default": false,
+							"title": "Allow username profanity",
+							"examples": [
+								false
+							]
+						},
+						"serverListTitle": {
+							"type": "string",
+							"default": "",
+							"title": "Title for link at the top of multiplayer",
+							"examples": [
+								"My cool link"
+							]
+						},
+						"serverListLink": {
+							"type": "string",
+							"default": "",
+							"title": "Link at the top of multiplayer",
+							"examples": [
+								"https://example.com"
+							]
+						},
+						"relays": {
+							"type": "array",
+							"default": [],
+							"title": "Default LAN Relays",
+							"items": {
+								"type": "object",
+								"title": "LAN Relay",
+								"required": [
+									"addr",
+									"name"
+								],
+								"properties": {
+									"addr": {
+										"type": "string",
+										"title": "Relay address",
+										"examples": [
+											"wss://relay.deev.is/",
+											"wss://relay.lax1dude.net/",
+											"wss://relay.shhnowisnottheti.me/"
+										]
+									},
+									"name": {
+										"type": "string",
+										"title": "Relay name",
+										"examples": [
+											"lax1dude relay #1",
+											"lax1dude relay #2",
+											"ayunami relay #1"
+										]
+									},
+									"primary": {
+										"type": "boolean",
+										"title": "Use this relay by default",
+										"examples": [
+											true,
+											false
+										]
+									}
+								},
+								"examples": [{
+									"addr": "wss://relay.deev.is/",
+									"name": "lax1dude relay #1",
+									"primary": true
+								},
+								{
+									"addr": "wss://relay.lax1dude.net/",
+									"name": "lax1dude relay #2",
+									"primary": false
+								},
+								{
+									"addr": "wss://relay.shhnowisnottheti.me/",
+									"name": "ayunami relay #1",
+									"primary": false
+								}]
+							},
+							"examples": [
+								[{
+									"addr": "wss://relay.deev.is/",
+									"name": "lax1dude relay #1",
+									"primary": true
+								},
+								{
+									"addr": "wss://relay.lax1dude.net/",
+									"name": "lax1dude relay #2",
+									"primary": false
+								},
+								{
+									"addr": "wss://relay.shhnowisnottheti.me/",
+									"name": "ayunami relay #1",
+									"primary": false
+								}]
+							]
+						},
+						"mainMenu": {
+							"type": "object",
+							"default": {},
+							"title": "Title screen options",
+							"required": [
+							],
+							"properties": {
+								"splashes": {
+									"type": "array",
+									"default": [],
+									"title": "Title screen splash texts",
+									"items": {
+										"type": "string",
+										"title": "Splash text",
+										"examples": [
+											"Darviglet!",
+											"eaglerenophile!",
+											"You Eagler!",
+											"Yeeeeeee!",
+											"yeee",
+											"EEEEEEEEE!",
+											"You Darvig!",
+											"You Vigg!",
+											":\u003e",
+											"|\u003e",
+											"You Yumpster!"
+										]
+									},
+									"examples": [
+										["Darviglet!",
+											"eaglerenophile!",
+											"You Eagler!",
+											"Yeeeeeee!",
+											"yeee",
+											"EEEEEEEEE!",
+											"You Darvig!",
+											"You Vigg!",
+											":\u003e",
+											"|\u003e",
+											"You Yumpster!"
+										]
+									]
+								},
+								"eaglerLogo": {
+									"type": "boolean",
+									"default": false,
+									"title": "Use Eaglercraft logo instead",
+									"examples": [
+										false
+									]
+								},
+								"itemLink": {
+									"type": "string",
+									"default": "",
+									"title": "Link for item on title screen",
+									"examples": [
+										"https://totalfreedom.me"
+									]
+								},
+								"itemLine0": {
+									"type": "string",
+									"default": "",
+									"title": "First line for item on title screen",
+									"examples": [
+										"Hello..."
+									]
+								},
+								"itemLine1": {
+									"type": "string",
+									"default": "",
+									"title": "Second line for item on title screen",
+									"examples": [
+										"...Please click this!"
+									]
+								},
+								"itemLine2": {
+									"type": "string",
+									"default": "",
+									"title": "Last line for item on title screen",
+									"examples": [
+										"It's very cool!"
+									]
+								}
+							},
+							"examples": [{
+								"splashes": [
+									"Darviglet!",
+									"eaglerenophile!",
+									"You Eagler!",
+									"Yeeeeeee!",
+									"yeee",
+									"EEEEEEEEE!",
+									"You Darvig!",
+									"You Vigg!",
+									":\u003e",
+									"|\u003e",
+									"You Yumpster!"
+								],
+								"eaglerLogo": false,
+								"itemLink": "https://totalfreedom.me",
+								"itemLine0": "First line for item on title screen",
+								"itemLine1": "Second line for item on title screen",
+								"itemLine2": "Last line for item on title screen"
+							}]
 						}
 					},
 					"examples": [{
-						"splashes": [
-							"Amongst ourselves",
-							"you eagler",
-							"yee",
-							"you darviglet"
-						],
+						"container": "game_frame",
+						"assetsURI": "assets.epk",
+						"serverWorkerURI": "worker_bootstrap.js",
+						"worldsFolder": "MAIN",
 						"servers": [{
-							"name": "template",
-							"ip": "ws(s):// (address here):(port) /",
-							"hideAddress": true
-						}]
+							"serverName": "server name",
+							"serverAddress": "ws://localhost:25565/",
+							"hideAddress": false
+						}],
+						"hideDownServers": false,
+						"joinServer": "wss://sus.shhnowisnottheti.me/",
+						"assetOverrides": {
+							"title/no-pano-blur.flag": "",
+							"sounds/gta.mp3": "https://real.shhnowisnottheti.me/menu.mp3",
+							"records/mellohi.mp3": "https://stream.nightride.fm/chillsynth.m4a"
+						},
+						"profanity": false,
+						"serverListTitle": "My cool link",
+						"serverListLink": "https://example.com",
+						"relays": [{
+							"addr": "wss://relay.deev.is/",
+							"name": "lax1dude relay #1",
+							"primary": true
+						},
+						{
+							"addr": "wss://relay.lax1dude.net/",
+							"name": "lax1dude relay #2",
+							"primary": false
+						},
+						{
+							"addr": "wss://relay.shhnowisnottheti.me/",
+							"name": "ayunami relay #1",
+							"primary": false
+						}],
+						"mainMenu": {
+							"splashes": [
+								"Darviglet!",
+								"eaglerenophile!",
+								"You Eagler!",
+								"Yeeeeeee!",
+								"yeee",
+								"EEEEEEEEE!",
+								"You Darvig!",
+								"You Vigg!",
+								":\u003e",
+								"|\u003e",
+								"You Yumpster!"
+							],
+							"eaglerLogo": false,
+							"itemLink": "https://totalfreedom.me",
+							"itemLine0": "First line for item on title screen",
+							"itemLine1": "Second line for item on title screen",
+							"itemLine2": "Last line for item on title screen"
+						}
 					}]
 				}
 			});
+			
+			const ta = document.getElementById('output');
 
-			function loadNBT(b64) {
-				let succeeded = false;
-				try {
-					nbt = NBT.readTag(textEncoder.encode(atob(b64)));
-					succeeded = loadNBTPieces();
-					editor.setValue(parsedNBT);
-				} catch (e) {  }
-				if (!succeeded) alert('something is wrong with your NBT!');
+			function relaysEqual(obj1, obj2) {
+				if (obj1 == null || obj2 == null) {
+					return obj1 == obj2;
+				}
+				if (obj1 == obj2) return true;
+				if (obj1.length != obj2.length) return false;
+				let good = 0;
+				for (const i in obj1) {
+					for (const ii in obj2) {
+						if (obj1[i] == obj2[ii]) {
+							++good;
+							break;
+						}
+						if (obj1[i].addr == obj2[ii].addr && obj1[i].name == obj2[ii].name) {
+							if (('primary' in obj1[i] && 'primary' in obj2[ii] && obj1[i].primary == obj2[ii].primary) || (!('primary' in obj1[i]) && !('primary' in obj2[ii]))) {
+								++good;
+								break;
+							}
+						}
+					}
+				}
+				if (good == obj1.length) return true;
 			}
 
-			function saveNBT() {
+			function saveOpts() {
 				const errors = editor.validate();
 
 				if (errors.length) {
-					console.error(errors);
-				} else {
-					parsedNBT = editor.getValue();
-					saveNBTPieces();
-				}
-
-				prompt('Copy and paste this ', btoa(textDecoder.decode(nbt.save().toArrayBuffer())));
-			}
-
-			function loadNBTPieces() {
-				if (nbt.typeName == 'compound') {
-					let mainMenu = nbt.get('mainMenu');
-					let splashes = null;
-					if (mainMenu != null && mainMenu.typeName == 'compound') {
-						splashes = mainMenu.get('splashes');
-						if (splashes != null && splashes.typeName == 'list') {
-							let splashesOut = [];
-							for (let splash of splashes.list) {
-								if (splash != null && splash.typeName == 'string') {
-									splashesOut.push(splash.toString());
-								}
-							}
-							splashes = splashesOut;
-						} else {
-							splashes = [];
-						}
-					}
-					let servers = nbt.get('servers');
-					if (servers != null && servers.typeName == 'list') {
-						let serversOut = [];
-						for (let server of servers.list) {
-							if (server != null && server.typeName == 'compound') {
-								let serverOut = {};
-								let serverIp = server.get('ip');
-								if (serverIp != null && serverIp.typeName == 'string') {
-									serverIp = serverIp.toString();
-									let serverName = server.get('name');
-									if (serverName != null && serverName.typeName == 'string') {
-										serverName = serverName.toString();
-										let serverHideAddress = server.get('hideAddress');
-										if (serverHideAddress != null && serverHideAddress.typeName == 'byte') {
-											serverHideAddress = serverHideAddress.valueOf() > 0;
-											serverOut.ip = serverIp;
-											serverOut.name = serverName;
-											serverOut.hideAddress = serverHideAddress;
-											serversOut.push(serverOut);
-										}
-									}
-								}
-							}
-						}
-						servers = serversOut;
-
-						parsedNBT = { splashes: splashes, servers: servers };
-
-						return true;
-					}
-				}
-				return false;
-			}
-
-			function saveNBTPieces() {
-				if (nbt.get('mainMenu') == null) {
-					nbt.put('mainMenu', new NBT.NBTTagCompound());
-				}
-				if (nbt.get('mainMenu').get('splashes') == null) {
-					nbt.get('mainMenu').put('splashes', new NBT.NBTTagList());
-				}
-				nbt.get('mainMenu').get('splashes').clear();
-				if (parsedNBT.splashes.length > 0) {
-					for (let splash of parsedNBT.splashes) {
-						nbt.get('mainMenu').get('splashes').add(new NBT.NBTTagString(splash));
+					for (const error of errors) {
+						console.error(error);
 					}
 				} else {
-					//nbt.get('mainMenu').remove('splashes');
-					nbt.remove('mainMenu');
-				}
-				nbt.get('servers').clear();
-				for (let server of parsedNBT.servers) {
-					const serverItem = new NBT.NBTTagCompound();
-					serverItem.put('name', new NBT.NBTTagString(server.name));
-					serverItem.put('ip', new NBT.NBTTagString(server.ip));
-					serverItem.put('hideAddress', new NBT.NBTTagString(server.hideAddress));
-					nbt.get('servers').add(serverItem);
+					const outJson = JSON.parse(JSON.stringify(editor.getValue()));
+					if (outJson == null) return;
+					const uniqueId = Array.from(Array(20), () => Math.floor(Math.random() * 36).toString(36)).join('');
+					const setRelays = relaysEqual(outJson.relays, startJson.relays);
+					if (setRelays && 'relays' in outJson) {
+						for (const relay of outJson.relays) {
+							relay.primary = uniqueId;
+						}
+					}
+					ta.value = 'window.eaglercraftOpts = ' + JSON.stringify(outJson, null, 4) + ';';
+					if (setRelays) {
+						let h = -1;
+						ta.value = 'const relayId = Math.floor(Math.random() * ' + outJson.relays.length + ');\n' + ta.value.replaceAll('"' + uniqueId + '"', function() {
+							return 'relayId == ' + (++h);
+						});
+					}
+					ta.select();
+					ta.setSelectionRange(0, ta.value.length);
+					window.navigator.clipboard.writeText(ta.value);
 				}
 			}
 		</script>

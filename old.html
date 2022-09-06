@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script async src="https://arc.io/widget.min.js#HEPCFa3K"></script>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+		<title>ayunEaglerConfig [Legacy]</title>
+		<script type="text/javascript" src="long.js"></script>
+		<script type="text/javascript" src="PowerNBT.min.js"></script>
+		<script src="jsoneditor.min.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com"/>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+		<link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet"/>
+		<link href="style.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<sub><a href=".">Back to current version</a></sub>
+		<h1>ayunEaglerConfig [Legacy]</h1>
+		<p>Configure & customize your Eaglercraft client here!</p>
+		<button onclick="const nbtnbt = prompt('Enter base64 to import data from:', defB64); if (nbtnbt) loadNBT(nbtnbt);">Import NBT from base64...</button>
+		<button onclick="saveNBT();">Export NBT as base64...</button>
+		<br/>
+		<div id="editor"></div>
+		<script type="text/javascript">
+			const textEncoder = new TextEncoder();
+			const textDecoder = new TextDecoder();
+			const defB64 = 'CgAACQAHc2VydmVycwoAAAABCAAEbmFtZQAMbG9jYWwgc2VydmVyCAACaXAAD2xvY2FsaG9zdDoyNTU2NQEAC2hpZGVBZGRyZXNzAAAKAAhtYWluTWVudQkACHNwbGFzaGVzCAAAAAoACkRhcnZpZ2xldCEADkRhcnZpZ2xvcGhpbGUhAAtZb3UgRWFnbGVyIQALWWVlZWVlZWVlZSEAC1lvdSBZZWVsZXIhAA1FRUVFRUVFRUVFRUUhAAtZb3UgRGFydmlnIQAJWW91IFZpZ2chAAI6PgACfD4AAA==';
+
+			let nbt = NBT.readTag(textEncoder.encode(atob(defB64)));
+			let parsedNBT = {};
+
+			loadNBTPieces();
+
+			const editor = new JSONEditor(document.getElementById('editor'), {
+				startval: parsedNBT,
+				no_additional_properties: true,
+				schema: {
+					"$schema": "https://json-schema.org/draft/2019-09/schema",
+					"$id": "http://example.com/example.json",
+					"type": "object",
+					"default": {},
+					"title": "Eaglercraft Client Settings",
+					"required": [
+						"splashes",
+						"servers"
+					],
+					"properties": {
+						"splashes": {
+							"type": "array",
+							"default": [],
+							"title": "Splashes",
+							"items": {
+								"type": "string",
+								"title": "Splash Text",
+								"examples": [
+									"Amongst ourselves",
+									"you eagler",
+									"yee",
+									"you darviglet"
+								]
+							},
+							"examples": [
+								["Amongst ourselves",
+									"you eagler",
+									"yee",
+									"you darviglet"
+								]
+							]
+						},
+						"servers": {
+							"type": "array",
+							"default": [],
+							"title": "Server Items",
+							"items": {
+								"type": "object",
+								"default": {},
+								"title": "Server",
+								"required": [
+									"name",
+									"ip",
+									"hideAddress"
+								],
+								"properties": {
+									"name": {
+										"type": "string",
+										"default": "",
+										"title": "Name",
+										"examples": [
+											"template"
+										]
+									},
+									"ip": {
+										"type": "string",
+										"default": "",
+										"title": "IP",
+										"examples": [
+											"ws(s):// (address here):(port) /"
+										]
+									},
+									"hideAddress": {
+										"type": "boolean",
+										"default": false,
+										"title": "Hide Address",
+										"examples": [
+											true
+										]
+									}
+								},
+								"examples": [{
+									"name": "template",
+									"ip": "ws(s):// (address here):(port) /",
+									"hideAddress": true
+								}]
+							},
+							"examples": [
+								[{
+									"name": "template",
+									"ip": "ws(s):// (address here):(port) /",
+									"hideAddress": true
+								}]
+							]
+						}
+					},
+					"examples": [{
+						"splashes": [
+							"Amongst ourselves",
+							"you eagler",
+							"yee",
+							"you darviglet"
+						],
+						"servers": [{
+							"name": "template",
+							"ip": "ws(s):// (address here):(port) /",
+							"hideAddress": true
+						}]
+					}]
+				}
+			});
+
+			function loadNBT(b64) {
+				let succeeded = false;
+				try {
+					nbt = NBT.readTag(textEncoder.encode(atob(b64)));
+					succeeded = loadNBTPieces();
+					editor.setValue(parsedNBT);
+				} catch (e) {  }
+				if (!succeeded) alert('something is wrong with your NBT!');
+			}
+
+			function saveNBT() {
+				const errors = editor.validate();
+
+				if (errors.length) {
+					console.error(errors);
+				} else {
+					parsedNBT = editor.getValue();
+					saveNBTPieces();
+				}
+
+				prompt('Copy and paste this ', btoa(textDecoder.decode(nbt.save().toArrayBuffer())));
+			}
+
+			function loadNBTPieces() {
+				if (nbt.typeName == 'compound') {
+					let mainMenu = nbt.get('mainMenu');
+					let splashes = null;
+					if (mainMenu != null && mainMenu.typeName == 'compound') {
+						splashes = mainMenu.get('splashes');
+						if (splashes != null && splashes.typeName == 'list') {
+							let splashesOut = [];
+							for (let splash of splashes.list) {
+								if (splash != null && splash.typeName == 'string') {
+									splashesOut.push(splash.toString());
+								}
+							}
+							splashes = splashesOut;
+						} else {
+							splashes = [];
+						}
+					}
+					let servers = nbt.get('servers');
+					if (servers != null && servers.typeName == 'list') {
+						let serversOut = [];
+						for (let server of servers.list) {
+							if (server != null && server.typeName == 'compound') {
+								let serverOut = {};
+								let serverIp = server.get('ip');
+								if (serverIp != null && serverIp.typeName == 'string') {
+									serverIp = serverIp.toString();
+									let serverName = server.get('name');
+									if (serverName != null && serverName.typeName == 'string') {
+										serverName = serverName.toString();
+										let serverHideAddress = server.get('hideAddress');
+										if (serverHideAddress != null && serverHideAddress.typeName == 'byte') {
+											serverHideAddress = serverHideAddress.valueOf() > 0;
+											serverOut.ip = serverIp;
+											serverOut.name = serverName;
+											serverOut.hideAddress = serverHideAddress;
+											serversOut.push(serverOut);
+										}
+									}
+								}
+							}
+						}
+						servers = serversOut;
+
+						parsedNBT = { splashes: splashes, servers: servers };
+
+						return true;
+					}
+				}
+				return false;
+			}
+
+			function saveNBTPieces() {
+				if (nbt.get('mainMenu') == null) {
+					nbt.put('mainMenu', new NBT.NBTTagCompound());
+				}
+				if (nbt.get('mainMenu').get('splashes') == null) {
+					nbt.get('mainMenu').put('splashes', new NBT.NBTTagList());
+				}
+				nbt.get('mainMenu').get('splashes').clear();
+				if (parsedNBT.splashes.length > 0) {
+					for (let splash of parsedNBT.splashes) {
+						nbt.get('mainMenu').get('splashes').add(new NBT.NBTTagString(splash));
+					}
+				} else {
+					//nbt.get('mainMenu').remove('splashes');
+					nbt.remove('mainMenu');
+				}
+				nbt.get('servers').clear();
+				for (let server of parsedNBT.servers) {
+					const serverItem = new NBT.NBTTagCompound();
+					serverItem.put('name', new NBT.NBTTagString(server.name));
+					serverItem.put('ip', new NBT.NBTTagString(server.ip));
+					serverItem.put('hideAddress', new NBT.NBTTagString(server.hideAddress));
+					nbt.get('servers').add(serverItem);
+				}
+			}
+		</script>
+	</body>
+</html>
